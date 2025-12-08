@@ -131,8 +131,8 @@ choice = st.selectbox(
     ["Earthquake count per year", "Tsunami count per year", "Both"],
 )
 
-# reduced from (8, 3) -> ~30% smaller
-fig, ax = plt.subplots(figsize=(5.6, 2.1))
+# was (8, 3)
+fig, ax = plt.subplots(figsize=(5.6, 3))  # less horizontally wide
 
 if choice == "Earthquake count per year":
     ax.plot(yearly["year"], yearly["earthquake_count"], marker="o")
@@ -146,7 +146,6 @@ else:
 ax.set_xlabel("Year")
 ax.set_ylabel("Count")
 ax.grid(True, alpha=0.3)
-plt.tight_layout()
 st.pyplot(fig)
 
 # ------------------ REGION ANALYSIS ------------------ #
@@ -157,13 +156,12 @@ selected_region = st.selectbox("Select region:", regions)
 
 df_r = df[df["region"] == selected_region]
 
-st.markdown(f"<h3>{selected_region}: {len(df_r)} earthquakes</h3>", unsafe_allow_html=True)
+st.markdown(f"<h3>{selected_region}: {len[df_r]} earthquakes</h3>", unsafe_allow_html=True)
 
-# reduced from (6, 3) -> (4.2, 2.1)
-fig_r, ax_r = plt.subplots(figsize=(4.2, 2.1))
+# was (6, 3)
+fig_r, ax_r = plt.subplots(figsize=(4.2, 3))
 sns.histplot(df_r["magnitude"], bins=20, kde=True, ax=ax_r)
 ax_r.set_xlabel("Magnitude")
-plt.tight_layout()
 st.pyplot(fig_r)
 
 # =========================================================
@@ -214,13 +212,12 @@ with cA:
 with cB:
     y2 = st.selectbox("Boxplot Y-axis 2:", numeric_cols)
 
-# reduced from (10, 3) -> (7, 2.1)
-fig_b, axes = plt.subplots(1, 2, figsize=(7, 2.1))
+# was (10, 3)
+fig_b, axes = plt.subplots(1, 2, figsize=(7, 3))
 sns.boxplot(y=df[y1], ax=axes[0])
 sns.boxplot(y=df[y2], ax=axes[1])
 axes[0].set_title(y1)
 axes[1].set_title(y2)
-plt.tight_layout()
 st.pyplot(fig_b)
 
 # =========================================================
@@ -255,20 +252,18 @@ c1, c2 = st.columns(2)
 
 with c1:
     st.subheader("Histogram")
-    # reduced from (5, 3) -> (3.5, 2.1)
-    fig_h, ax_h = plt.subplots(figsize=(3.5, 2.1))
+    # was (5, 3)
+    fig_h, ax_h = plt.subplots(figsize=(3.5, 3))
     sns.histplot(df[hvar], bins=30, kde=False, ax=ax_h)
     ax_h.set_xlabel(hvar)
-    plt.tight_layout()
     st.pyplot(fig_h)
 
 with c2:
     st.subheader("Density Plot")
-    # reduced from (5, 3) -> (3.5, 2.1)
-    fig_k, ax_k = plt.subplots(figsize=(3.5, 2.1))
+    # was (5, 3)
+    fig_k, ax_k = plt.subplots(figsize=(3.5, 3))
     sns.kdeplot(df[hvar], fill=True, ax=ax_k)
     ax_k.set_xlabel(hvar)
-    plt.tight_layout()
     st.pyplot(fig_k)
 
 # =========================================================
@@ -279,10 +274,9 @@ st.markdown("<h2>➤ Correlation Matrix</h2>", unsafe_allow_html=True)
 corr = df[numeric_cols].corr()
 st.dataframe(corr)
 
-# reduced from (6, 5) -> (4.2, 3.5)
-fig_c, ax_c = plt.subplots(figsize=(4.2, 3.5))
+# was (6, 5)
+fig_c, ax_c = plt.subplots(figsize=(4.2, 5))
 sns.heatmap(corr, cmap="coolwarm", linewidths=0.5, ax=ax_c)
-plt.tight_layout()
 st.pyplot(fig_c)
 
 # =========================================================
@@ -295,31 +289,28 @@ y_sel = st.selectbox("Y-axis:", numeric_cols)
 
 # ---------- SCATTER ---------- #
 st.subheader("Scatter Plot")
-# reduced from (4, 3) -> (2.8, 2.1)
-fig_sc, ax_sc = plt.subplots(figsize=(2.8, 2.1))
+# was (4, 3)
+fig_sc, ax_sc = plt.subplots(figsize=(2.8, 3))
 sns.scatterplot(x=df[x_sel], y=df[y_sel], hue=df["tsunami"], palette="viridis", ax=ax_sc, s=20)
 ax_sc.set_xlabel(x_sel)
 ax_sc.set_ylabel(y_sel)
-plt.tight_layout()
 st.pyplot(fig_sc)
 
 # ---------- HEXBIN ---------- #
 st.subheader("Hexbin Plot")
-fig_hb, ax_hb = plt.subplots(figsize=(2.8, 2.1))
+fig_hb, ax_hb = plt.subplots(figsize=(2.8, 3))
 hb = ax_hb.hexbin(df[x_sel], df[y_sel], gridsize=30)
 fig_hb.colorbar(hb)
 ax_hb.set_xlabel(x_sel)
 ax_hb.set_ylabel(y_sel)
-plt.tight_layout()
 st.pyplot(fig_hb)
 
 # ---------- CONTOUR ---------- #
 st.subheader("Contour Plot")
-fig_ct, ax_ct = plt.subplots(figsize=(2.8, 2.1))
+fig_ct, ax_ct = plt.subplots(figsize=(2.8, 3))
 sns.kdeplot(x=df[x_sel], y=df[y_sel], fill=True, levels=15, ax=ax_ct)
 ax_ct.set_xlabel(x_sel)
 ax_ct.set_ylabel(y_sel)
-plt.tight_layout()
 st.pyplot(fig_ct)
 
 # ---------- VIOLIN ---------- #
@@ -331,30 +322,10 @@ cat_cols = [c for c in cat_cols if c in df.columns]
 vcat = st.selectbox("Category:", cat_cols)
 vy = st.selectbox("Numeric:", numeric_cols)
 
-# reduced from (4, 3) -> (2.8, 2.1)
-fig_v, ax_v = plt.subplots(figsize=(2.8, 2.1))
+# was (4, 3)
+fig_v, ax_v = plt.subplots(figsize=(2.8, 3))
 sns.violinplot(data=df, x=vcat, y=vy, ax=ax_v)
 plt.xticks(rotation=25)
 ax_v.set_xlabel(vcat)
 ax_v.set_ylabel(vy)
-plt.tight_layout()
 st.pyplot(fig_v)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
