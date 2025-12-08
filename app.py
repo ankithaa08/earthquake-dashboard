@@ -131,7 +131,6 @@ choice = st.selectbox(
     ["Earthquake count per year", "Tsunami count per year", "Both"],
 )
 
-# less horizontally wide than (8, 3)
 fig, ax = plt.subplots(figsize=(6, 3))
 
 if choice == "Earthquake count per year":
@@ -146,6 +145,7 @@ else:
 ax.set_xlabel("Year")
 ax.set_ylabel("Count")
 ax.grid(True, alpha=0.3)
+plt.tight_layout(pad=2)
 st.pyplot(fig)
 
 # ------------------ REGION ANALYSIS ------------------ #
@@ -158,10 +158,10 @@ df_r = df[df["region"] == selected_region]
 
 st.markdown(f"<h3>{selected_region}: {len(df_r)} earthquakes</h3>", unsafe_allow_html=True)
 
-# less wide than (6, 3)
 fig_r, ax_r = plt.subplots(figsize=(4.5, 3))
 sns.histplot(df_r["magnitude"], bins=20, kde=True, ax=ax_r)
 ax_r.set_xlabel("Magnitude")
+plt.tight_layout(pad=2)
 st.pyplot(fig_r)
 
 # =========================================================
@@ -212,12 +212,12 @@ with cA:
 with cB:
     y2 = st.selectbox("Boxplot Y-axis 2:", numeric_cols)
 
-# less wide than (10, 3)
 fig_b, axes = plt.subplots(1, 2, figsize=(7.5, 3))
 sns.boxplot(y=df[y1], ax=axes[0])
 sns.boxplot(y=df[y2], ax=axes[1])
 axes[0].set_title(y1)
 axes[1].set_title(y2)
+plt.tight_layout(pad=2)
 st.pyplot(fig_b)
 
 # =========================================================
@@ -252,10 +252,10 @@ c1, c2 = st.columns(2)
 
 with c1:
     st.subheader("Histogram")
-    # less wide than (5, 3)
     fig_h, ax_h = plt.subplots(figsize=(3.5, 3))
     sns.histplot(df[hvar], bins=30, kde=False, ax=ax_h)
     ax_h.set_xlabel(hvar)
+    plt.tight_layout(pad=2)
     st.pyplot(fig_h)
 
 with c2:
@@ -263,6 +263,7 @@ with c2:
     fig_k, ax_k = plt.subplots(figsize=(3.5, 3))
     sns.kdeplot(df[hvar], fill=True, ax=ax_k)
     ax_k.set_xlabel(hvar)
+    plt.tight_layout(pad=2)
     st.pyplot(fig_k)
 
 # =========================================================
@@ -273,9 +274,9 @@ st.markdown("<h2>➤ Correlation Matrix</h2>", unsafe_allow_html=True)
 corr = df[numeric_cols].corr()
 st.dataframe(corr)
 
-# less wide than (6, 5)
-fig_c, ax_c = plt.subplots(figsize=(4.5, 5))
+fig_c, ax_c = plt.subplots(figsize=(3, 4.5))  # narrow, tall
 sns.heatmap(corr, cmap="coolwarm", linewidths=0.5, ax=ax_c)
+plt.tight_layout(pad=2)
 st.pyplot(fig_c)
 
 # =========================================================
@@ -288,27 +289,37 @@ y_sel = st.selectbox("Y-axis:", numeric_cols)
 
 # ---------- SCATTER ---------- #
 st.subheader("Scatter Plot")
-fig_sc, ax_sc = plt.subplots(figsize=(3, 3))   # less wide than (4, 3)
-sns.scatterplot(x=df[x_sel], y=df[y_sel], hue=df["tsunami"], palette="viridis", ax=ax_sc, s=20)
+fig_sc, ax_sc = plt.subplots(figsize=(2.2, 3))   # narrow with side white space
+sns.scatterplot(
+    x=df[x_sel], y=df[y_sel],
+    hue=df["tsunami"], palette="viridis",
+    ax=ax_sc, s=20
+)
 ax_sc.set_xlabel(x_sel)
 ax_sc.set_ylabel(y_sel)
+plt.tight_layout(pad=2)
 st.pyplot(fig_sc)
 
 # ---------- HEXBIN ---------- #
 st.subheader("Hexbin Plot")
-fig_hb, ax_hb = plt.subplots(figsize=(3, 3))
+fig_hb, ax_hb = plt.subplots(figsize=(2.2, 3))
 hb = ax_hb.hexbin(df[x_sel], df[y_sel], gridsize=30)
 fig_hb.colorbar(hb)
 ax_hb.set_xlabel(x_sel)
 ax_hb.set_ylabel(y_sel)
+plt.tight_layout(pad=2)
 st.pyplot(fig_hb)
 
 # ---------- CONTOUR ---------- #
 st.subheader("Contour Plot")
-fig_ct, ax_ct = plt.subplots(figsize=(3, 3))
-sns.kdeplot(x=df[x_sel], y=df[y_sel], fill=True, levels=15, ax=ax_ct)
+fig_ct, ax_ct = plt.subplots(figsize=(2.2, 3))
+sns.kdeplot(
+    x=df[x_sel], y=df[y_sel],
+    fill=True, levels=15, ax=ax_ct
+)
 ax_ct.set_xlabel(x_sel)
 ax_ct.set_ylabel(y_sel)
+plt.tight_layout(pad=2)
 st.pyplot(fig_ct)
 
 # ---------- VIOLIN ---------- #
@@ -320,10 +331,13 @@ cat_cols = [c for c in cat_cols if c in df.columns]
 vcat = st.selectbox("Category:", cat_cols)
 vy = st.selectbox("Numeric:", numeric_cols)
 
-fig_v, ax_v = plt.subplots(figsize=(3, 3))   # less wide than (4, 3)
+fig_v, ax_v = plt.subplots(figsize=(2.2, 3))
 sns.violinplot(data=df, x=vcat, y=vy, ax=ax_v)
 plt.xticks(rotation=25)
 ax_v.set_xlabel(vcat)
 ax_v.set_ylabel(vy)
+plt.tight_layout(pad=2)
 st.pyplot(fig_v)
+
+
 
