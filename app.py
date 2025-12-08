@@ -269,7 +269,7 @@ st.markdown("<h2>➤ Correlation Matrix</h2>", unsafe_allow_html=True)
 corr = df[numeric_cols].corr()
 st.dataframe(corr)
 
-fig_c, ax_c = plt.subplots(figsize=(7, 5))
+fig_c, ax_c = plt.subplots(figsize=(6, 5))
 sns.heatmap(corr, cmap="coolwarm", linewidths=0.5, ax=ax_c)
 st.pyplot(fig_c)
 
@@ -283,7 +283,7 @@ y_sel = st.selectbox("Y-axis:", numeric_cols)
 
 # ---------- SCATTER ---------- #
 st.subheader("Scatter Plot")
-fig_sc, ax_sc = plt.subplots(figsize=(5, 3))
+fig_sc, ax_sc = plt.subplots(figsize=(4, 3))
 sns.scatterplot(x=df[x_sel], y=df[y_sel], hue=df["tsunami"], palette="viridis", ax=ax_sc, s=20)
 ax_sc.set_xlabel(x_sel)
 ax_sc.set_ylabel(y_sel)
@@ -291,7 +291,7 @@ st.pyplot(fig_sc)
 
 # ---------- HEXBIN ---------- #
 st.subheader("Hexbin Plot")
-fig_hb, ax_hb = plt.subplots(figsize=(5, 3))
+fig_hb, ax_hb = plt.subplots(figsize=(4, 3))
 hb = ax_hb.hexbin(df[x_sel], df[y_sel], gridsize=30)
 fig_hb.colorbar(hb)
 ax_hb.set_xlabel(x_sel)
@@ -300,7 +300,7 @@ st.pyplot(fig_hb)
 
 # ---------- CONTOUR ---------- #
 st.subheader("Contour Plot")
-fig_ct, ax_ct = plt.subplots(figsize=(5, 3))
+fig_ct, ax_ct = plt.subplots(figsize=(4, 3))
 sns.kdeplot(x=df[x_sel], y=df[y_sel], fill=True, levels=15, ax=ax_ct)
 ax_ct.set_xlabel(x_sel)
 ax_ct.set_ylabel(y_sel)
@@ -315,12 +315,13 @@ cat_cols = [c for c in cat_cols if c in df.columns]
 vcat = st.selectbox("Category:", cat_cols)
 vy = st.selectbox("Numeric:", numeric_cols)
 
-fig_v, ax_v = plt.subplots(figsize=(6, 3.5))
+fig_v, ax_v = plt.subplots(figsize=(4, 3))
 sns.violinplot(data=df, x=vcat, y=vy, ax=ax_v)
 plt.xticks(rotation=25)
 ax_v.set_xlabel(vcat)
 ax_v.set_ylabel(vy)
 st.pyplot(fig_v)
+
 
 
 
