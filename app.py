@@ -321,11 +321,12 @@ cat_cols = [c for c in cat_cols if c in df.columns]
 vcat = st.selectbox("Category:", cat_cols)
 vy = st.selectbox("Numeric:", numeric_cols)
 
-fig_v, ax_v = plt.subplots(figsize=(4, 3))
+fig_v, ax_v = plt.subplots(figsize=(2, 3))
 sns.violinplot(data=df, x=vcat, y=vy, ax=ax_v)
 plt.xticks(rotation=25)
 ax_v.set_xlabel(vcat)
 ax_v.set_ylabel(vy)
 centered_pyplot(fig_v)
+
 
 
