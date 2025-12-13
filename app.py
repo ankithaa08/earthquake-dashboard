@@ -140,6 +140,70 @@ show_plot(fig_r)
 st.info("Conclusion: Magnitude distribution differs by geographic region.")
 
 # =========================================================
+# GEOSPATIAL EARTHQUAKE MAP
+# =========================================================
+st.markdown("<h2>➤ Global Earthquake Map</h2>", unsafe_allow_html=True)
+
+map_df = df.dropna(subset=["latitude", "longitude", "magnitude"])
+
+# Dropdown to control map view
+map_view = st.selectbox(
+    "Map color represents:",
+    ["Magnitude", "Depth"]
+)
+
+if map_view == "Magnitude":
+    color_col = "magnitude"
+    color_scale = [255, 100, 100]
+    st.caption("🔴 Darker points = stronger earthquakes")
+else:
+    color_col = "depth"
+    color_scale = [100, 100, 255]
+    st.caption("🔵 Darker points = deeper earthquakes")
+
+# Normalize values for color intensity
+norm = (map_df[color_col] - map_df[color_col].min()) / (
+    map_df[color_col].max() - map_df[color_col].min()
+)
+
+map_df["color_r"] = (norm * color_scale[0]).astype(int)
+map_df["color_g"] = (norm * color_scale[1]).astype(int)
+map_df["color_b"] = (norm * color_scale[2]).astype(int)
+
+import pydeck as pdk
+
+layer = pdk.Layer(
+    "ScatterplotLayer",
+    data=map_df,
+    get_position="[longitude, latitude]",
+    get_radius="magnitude * 10000",
+    get_fill_color="[color_r, color_g, color_b, 160]",
+    pickable=True,
+)
+
+view_state = pdk.ViewState(
+    latitude=0,
+    longitude=0,
+    zoom=1,
+)
+
+deck = pdk.Deck(
+    layers=[layer],
+    initial_view_state=view_state,
+    tooltip={
+        "text": "Magnitude: {magnitude}\nDepth: {depth} km\nRegion: {region}"
+    },
+)
+
+st.pydeck_chart(deck)
+
+st.info(
+    "Conclusion: Earthquakes are concentrated along tectonic plate boundaries, "
+    "with high-magnitude events forming visible seismic belts."
+)
+
+
+# =========================================================
 # SUMMARY STATISTICS (MEANINGFUL ONLY)
 # =========================================================
 st.markdown("<h2>➤ Summary Statistics</h2>", unsafe_allow_html=True)
@@ -312,5 +376,6 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
