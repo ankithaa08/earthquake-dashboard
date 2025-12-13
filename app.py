@@ -146,16 +146,20 @@ st.markdown("<h2>➤ Global Earthquake Risk Map</h2>", unsafe_allow_html=True)
 
 map_df = df.dropna(subset=["latitude", "longitude", "magnitude"])
 
-# ---------- RISK CLASSIFICATION ----------
+# ---------- DATA-DRIVEN RISK CLASSIFICATION ----------
+q1 = map_df["magnitude"].quantile(0.33)
+q2 = map_df["magnitude"].quantile(0.66)
+
 def risk_level(mag):
-    if mag < 5:
+    if mag <= q1:
         return "Low"
-    elif mag < 6.5:
+    elif mag <= q2:
         return "Moderate"
     else:
         return "High"
 
 map_df["risk"] = map_df["magnitude"].apply(risk_level)
+
 
 # Color mapping (RGBA)
 color_map = {
@@ -379,6 +383,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
