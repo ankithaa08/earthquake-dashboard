@@ -197,15 +197,17 @@ st.info("Conclusion: Data distributions are skewed and non-normal.")
 # =========================================================
 # SPEARMAN CORRELATION WITH P-VALUE
 # =========================================================
+# SPEARMAN CORRELATION WITH CLEAR P-VALUE INTERPRETATION
+# =========================================================
 st.markdown("<h2>➤ Spearman Correlation Analysis</h2>", unsafe_allow_html=True)
 
 from scipy.stats import spearmanr
 
 data = df[meaningful_cols].dropna()
 
-# Spearman correlation & p-values
 corr_matrix = pd.DataFrame(index=data.columns, columns=data.columns, dtype=float)
 pval_matrix = pd.DataFrame(index=data.columns, columns=data.columns, dtype=float)
+sig_matrix = pd.DataFrame(index=data.columns, columns=data.columns, dtype=str)
 
 for col1 in data.columns:
     for col2 in data.columns:
@@ -213,7 +215,13 @@ for col1 in data.columns:
         corr_matrix.loc[col1, col2] = rho
         pval_matrix.loc[col1, col2] = pval
 
-# Heatmap of Spearman correlation
+        # Significance labeling
+        if pval < 0.05 and col1 != col2:
+            sig_matrix.loc[col1, col2] = "Significant ✅"
+        else:
+            sig_matrix.loc[col1, col2] = "Not Significant ❌"
+
+# Heatmap
 fig_c, ax_c = plt.subplots(figsize=(6, 4))
 sns.heatmap(
     corr_matrix,
@@ -225,38 +233,43 @@ sns.heatmap(
 )
 show_plot(fig_c)
 
-st.subheader("Spearman Correlation Matrix (ρ)")
+# Tables
+st.subheader("Spearman Correlation Coefficient (ρ)")
 st.dataframe(corr_matrix.round(3))
 
-st.subheader("P-value Matrix")
+st.subheader("P-Value Matrix")
 st.dataframe(pval_matrix.round(4))
 
-# Explanation
-st.info(
-    """
-    **Explanation:**
-    - Spearman correlation measures the **monotonic relationship** between variables.
-    - It is suitable here because earthquake data is **non-normal and skewed**.
-    - A p-value **< 0.05** indicates a statistically significant relationship.
-    """
-)
+st.subheader("Statistical Significance (α = 0.05)")
+st.dataframe(sig_matrix)
 
-# Key interpretation
-sig_pairs = [
-    f"{i} ↔ {j}"
+# Clear explanation
+st.info("""
+**How to read this:**
+- Spearman correlation (ρ) shows the strength and direction of the relationship.
+- The p-value checks whether this relationship is statistically reliable.
+- If **p < 0.05**, the relationship is **statistically significant**.
+- If **p ≥ 0.05**, the relationship is **not statistically significant**.
+""")
+
+# Final interpretation
+significant_pairs = [
+    f"{i} & {j}"
     for i in corr_matrix.columns
     for j in corr_matrix.columns
     if i != j and pval_matrix.loc[i, j] < 0.05
 ]
 
-if sig_pairs:
+if significant_pairs:
     st.success(
-        "Conclusion: Statistically significant monotonic relationships exist between "
-        + ", ".join(set(sig_pairs)) + "."
+        "Conclusion: A statistically significant relationship exists between "
+        + ", ".join(set(significant_pairs))
+        + ". This means these variables are meaningfully related, not by chance."
     )
 else:
     st.warning(
-        "Conclusion: No statistically significant monotonic relationships were found (p ≥ 0.05)."
+        "Conclusion: No statistically significant relationships were found. "
+        "Observed correlations may be due to random variation."
     )
 
 
@@ -299,4 +312,5 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
