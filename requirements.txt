@@ -4,4 +4,6 @@ numpy
 seaborn
 matplotlib
 scipy
+pydeck
+
 
