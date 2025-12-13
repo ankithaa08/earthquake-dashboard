@@ -193,18 +193,72 @@ show_plot(fig_k)
 st.info("Conclusion: Data distributions are skewed and non-normal.")
 
 # =========================================================
-# CORRELATION (SPEARMAN)
 # =========================================================
-st.markdown("<h2>➤ Spearman Correlation</h2>", unsafe_allow_html=True)
+# =========================================================
+# SPEARMAN CORRELATION WITH P-VALUE
+# =========================================================
+st.markdown("<h2>➤ Spearman Correlation Analysis</h2>", unsafe_allow_html=True)
 
-data=df[meaningful_cols].dropna()
-corr=data.corr(method="spearman")
+from scipy.stats import spearmanr
 
-fig_c,ax_c=plt.subplots(figsize=(6,4))
-sns.heatmap(corr,annot=True,cmap="coolwarm",vmin=-1,vmax=1,ax=ax_c)
+data = df[meaningful_cols].dropna()
+
+# Spearman correlation & p-values
+corr_matrix = pd.DataFrame(index=data.columns, columns=data.columns, dtype=float)
+pval_matrix = pd.DataFrame(index=data.columns, columns=data.columns, dtype=float)
+
+for col1 in data.columns:
+    for col2 in data.columns:
+        rho, pval = spearmanr(data[col1], data[col2])
+        corr_matrix.loc[col1, col2] = rho
+        pval_matrix.loc[col1, col2] = pval
+
+# Heatmap of Spearman correlation
+fig_c, ax_c = plt.subplots(figsize=(6, 4))
+sns.heatmap(
+    corr_matrix,
+    annot=True,
+    cmap="coolwarm",
+    vmin=-1,
+    vmax=1,
+    ax=ax_c
+)
 show_plot(fig_c)
 
-st.info("Conclusion: Magnitude shows a strong monotonic relationship with significance.")
+st.subheader("Spearman Correlation Matrix (ρ)")
+st.dataframe(corr_matrix.round(3))
+
+st.subheader("P-value Matrix")
+st.dataframe(pval_matrix.round(4))
+
+# Explanation
+st.info(
+    """
+    **Explanation:**
+    - Spearman correlation measures the **monotonic relationship** between variables.
+    - It is suitable here because earthquake data is **non-normal and skewed**.
+    - A p-value **< 0.05** indicates a statistically significant relationship.
+    """
+)
+
+# Key interpretation
+sig_pairs = [
+    f"{i} ↔ {j}"
+    for i in corr_matrix.columns
+    for j in corr_matrix.columns
+    if i != j and pval_matrix.loc[i, j] < 0.05
+]
+
+if sig_pairs:
+    st.success(
+        "Conclusion: Statistically significant monotonic relationships exist between "
+        + ", ".join(set(sig_pairs)) + "."
+    )
+else:
+    st.warning(
+        "Conclusion: No statistically significant monotonic relationships were found (p ≥ 0.05)."
+    )
+
 
 # =========================================================
 # RELATIONSHIP PLOTS (UNCHANGED)
@@ -245,3 +299,4 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
