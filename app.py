@@ -140,44 +140,41 @@ show_plot(fig_r)
 st.info("Conclusion: Magnitude distribution differs by geographic region.")
 
 # =========================================================
-# GEOSPATIAL EARTHQUAKE MAP
+# MEANINGFUL RISK-BASED EARTHQUAKE MAP
 # =========================================================
-st.markdown("<h2>➤ Global Earthquake Map</h2>", unsafe_allow_html=True)
+st.markdown("<h2>➤ Global Earthquake Risk Map</h2>", unsafe_allow_html=True)
 
 map_df = df.dropna(subset=["latitude", "longitude", "magnitude"])
 
-# Dropdown to control map view
-map_view = st.selectbox(
-    "Map color represents:",
-    ["Magnitude", "Depth"]
-)
+# ---------- RISK CLASSIFICATION ----------
+def risk_level(mag):
+    if mag < 5:
+        return "Low"
+    elif mag < 6.5:
+        return "Moderate"
+    else:
+        return "High"
 
-if map_view == "Magnitude":
-    color_col = "magnitude"
-    color_scale = [255, 100, 100]
-    st.caption("🔴 Darker points = stronger earthquakes")
-else:
-    color_col = "depth"
-    color_scale = [100, 100, 255]
-    st.caption("🔵 Darker points = deeper earthquakes")
+map_df["risk"] = map_df["magnitude"].apply(risk_level)
 
-# Normalize values for color intensity
-norm = (map_df[color_col] - map_df[color_col].min()) / (
-    map_df[color_col].max() - map_df[color_col].min()
-)
+# Color mapping (RGBA)
+color_map = {
+    "Low": [0, 200, 0, 120],        # Green
+    "Moderate": [255, 165, 0, 160], # Orange
+    "High": [255, 0, 0, 200]        # Red
+}
 
-map_df["color_r"] = (norm * color_scale[0]).astype(int)
-map_df["color_g"] = (norm * color_scale[1]).astype(int)
-map_df["color_b"] = (norm * color_scale[2]).astype(int)
+map_df["color"] = map_df["risk"].map(color_map)
 
+# ---------- PYDECK LAYER ----------
 import pydeck as pdk
 
 layer = pdk.Layer(
     "ScatterplotLayer",
     data=map_df,
     get_position="[longitude, latitude]",
-    get_radius="magnitude * 10000",
-    get_fill_color="[color_r, color_g, color_b, 160]",
+    get_radius="magnitude * 12000",   # Size reflects magnitude
+    get_fill_color="color",           # Color reflects risk
     pickable=True,
 )
 
@@ -191,16 +188,22 @@ deck = pdk.Deck(
     layers=[layer],
     initial_view_state=view_state,
     tooltip={
-        "text": "Magnitude: {magnitude}\nDepth: {depth} km\nRegion: {region}"
+        "text": (
+            "Magnitude: {magnitude}\n"
+            "Depth: {depth} km\n"
+            "Risk Level: {risk}\n"
+            "Region: {region}"
+        )
     },
 )
 
 st.pydeck_chart(deck)
 
 st.info(
-    "Conclusion: Earthquakes are concentrated along tectonic plate boundaries, "
-    "with high-magnitude events forming visible seismic belts."
+    "Conclusion: High-risk earthquakes (red points) are concentrated along tectonic plate boundaries, "
+    "while low-risk events are more widely distributed."
 )
+
 
 
 # =========================================================
@@ -376,6 +379,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
