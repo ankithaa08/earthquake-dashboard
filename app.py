@@ -140,6 +140,32 @@ show_plot(fig_r)
 st.info("Conclusion: Magnitude distribution differs by geographic region.")
 
 # =========================================================
+# DEPTH vs EARTHQUAKE INTENSITY
+# =========================================================
+st.markdown("<h2>➤ Depth vs Earthquake Intensity</h2>", unsafe_allow_html=True)
+
+intensity_var = st.selectbox(
+    "Select intensity measure:",
+    ["cdi", "mmi"]
+)
+
+fig_int, ax_int = plt.subplots(figsize=(5, 3))
+sns.boxplot(
+    x="depth_category",
+    y=intensity_var,
+    data=df,
+    ax=ax_int
+)
+ax_int.set_xlabel("Depth Category")
+ax_int.set_ylabel(intensity_var.upper())
+show_plot(fig_int)
+
+st.info(
+    "Conclusion: Shallow earthquakes tend to produce higher intensity and damage compared to deeper earthquakes."
+)
+
+
+# =========================================================
 # SUMMARY STATISTICS (MEANINGFUL ONLY)
 # =========================================================
 st.markdown("<h2>➤ Summary Statistics</h2>", unsafe_allow_html=True)
@@ -158,6 +184,43 @@ for col in meaningful_cols:
 
 st.dataframe(pd.DataFrame(summary).set_index("Variable"))
 st.info("Conclusion: High variability and skewness are observed in earthquake data.")
+# =========================================================
+# MAGNITUDE vs TSUNAMI RISK
+# =========================================================
+st.markdown("<h2>➤ Magnitude vs Tsunami Risk</h2>", unsafe_allow_html=True)
+
+risk_df = df.copy()
+risk_df = risk_df.dropna(subset=["magnitude", "tsunami"])
+
+risk_df["mag_risk"] = pd.cut(
+    risk_df["magnitude"],
+    bins=[0, 4, 6, 10],
+    labels=["Low (<4)", "Moderate (4–5.9)", "High (6+)"]
+)
+
+risk_summary = (
+    risk_df.groupby("mag_risk")["tsunami"]
+    .mean()
+    .reset_index()
+)
+
+risk_summary["Tsunami Probability (%)"] = risk_summary["tsunami"] * 100
+
+fig_risk, ax_risk = plt.subplots(figsize=(5, 3))
+sns.barplot(
+    x="mag_risk",
+    y="Tsunami Probability (%)",
+    data=risk_summary,
+    ax=ax_risk
+)
+ax_risk.set_xlabel("Magnitude Category")
+ax_risk.set_ylabel("Tsunami Probability (%)")
+show_plot(fig_risk)
+
+st.info(
+    "Conclusion: The probability of tsunami occurrence increases significantly with earthquake magnitude."
+)
+
 
 # =========================================================
 # BOXPLOTS
@@ -245,6 +308,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
