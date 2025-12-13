@@ -215,17 +215,20 @@ x_sel=st.selectbox("X-axis:",numeric_cols,index=0)
 y_sel=st.selectbox("Y-axis:",numeric_cols,index=1)
 
 # Scatter
+st.subheader("Scatter Plot")
 fig_sc,ax_sc=plt.subplots(figsize=(5,3))
 sns.scatterplot(x=df[x_sel],y=df[y_sel],hue=df["tsunami"],ax=ax_sc,s=20)
 show_plot(fig_sc)
 
 # Hexbin
+st.subheader("Hexbin Plot")
 fig_hb,ax_hb=plt.subplots(figsize=(5,3))
 hb=ax_hb.hexbin(df[x_sel],df[y_sel],gridsize=25)
 fig_hb.colorbar(hb)
 show_plot(fig_hb)
 
 # Contour
+st.subheader("Contour Plot")
 fig_ct,ax_ct=plt.subplots(figsize=(5,3))
 sns.kdeplot(x=df[x_sel].dropna(),y=df[y_sel].dropna(),fill=True,ax=ax_ct)
 show_plot(fig_ct)
@@ -242,6 +245,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
