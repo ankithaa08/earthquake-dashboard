@@ -151,7 +151,6 @@ else:
         f"{'low' if total_eq < 20 else 'moderate'}. "
         f"The average magnitude is approximately {avg_mag:.2f}, "
         f"with a maximum recorded magnitude of {max_mag:.2f}. "
-        "Due to limited observations in some regions, distribution-based plots are not shown."
     )
 
 
@@ -166,7 +165,7 @@ map_df = df.dropna(subset=["latitude", "longitude", "magnitude"])
 q1 = map_df["magnitude"].quantile(0.33)
 q2 = map_df["magnitude"].quantile(0.66)
 
-def risk_level(mag):
+def relative_risk(mag):
     if mag <= q1:
         return "Low"
     elif mag <= q2:
@@ -174,7 +173,7 @@ def risk_level(mag):
     else:
         return "High"
 
-map_df["risk"] = map_df["magnitude"].apply(risk_level)
+map_df["risk"] = map_df["magnitude"].apply(relative_risk)
 
 
 # Color mapping (RGBA)
@@ -220,9 +219,11 @@ deck = pdk.Deck(
 st.pydeck_chart(deck)
 
 st.info(
-    "Conclusion: High-risk earthquakes (red points) are concentrated along tectonic plate boundaries, "
-    "while low-risk events are more widely distributed."
+    "Conclusion: Higher-magnitude earthquakes (shown in red) are concentrated along tectonic plate "
+    "boundaries, particularly around the Pacific Ring of Fire. "
+    "The risk levels shown are relative classifications based on magnitude distribution."
 )
+
 
 
 
@@ -414,6 +415,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
