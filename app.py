@@ -159,9 +159,10 @@ else:
 # =========================================================
 st.markdown("<h2>➤ Global Earthquake Risk Map</h2>", unsafe_allow_html=True)
 
-map_df = df.dropna(subset=["latitude", "longitude", "magnitude"])
+# Keep only valid spatial & magnitude data
+map_df = df.dropna(subset=["latitude", "longitude", "magnitude"]).copy()
 
-# ---------- DATA-DRIVEN RISK CLASSIFICATION ----------
+# ---------- DATA-DRIVEN RELATIVE RISK ----------
 q1 = map_df["magnitude"].quantile(0.33)
 q2 = map_df["magnitude"].quantile(0.66)
 
@@ -173,14 +174,13 @@ def relative_risk(mag):
     else:
         return "High"
 
-map_df["risk"] = map_df["magnitude"].apply(relative_risk)
+map_df["risk"] = map_df["magnitude"].apply(relative_risk).astype(str)
 
-
-# Color mapping (RGBA)
+# ---------- COLOR MAPPING (RGBA) ----------
 color_map = {
-    "Low": [0, 200, 0, 120],        # Green
-    "Moderate": [255, 165, 0, 160], # Orange
-    "High": [255, 0, 0, 200]        # Red
+    "Low": [0, 180, 0, 180],        # Green
+    "Moderate": [255, 165, 0, 200], # Orange
+    "High": [220, 20, 60, 220]      # Red
 }
 
 map_df["color"] = map_df["risk"].map(color_map)
@@ -192,8 +192,8 @@ layer = pdk.Layer(
     "ScatterplotLayer",
     data=map_df,
     get_position="[longitude, latitude]",
-    get_radius="magnitude * 12000",   # Size reflects magnitude
-    get_fill_color="color",           # Color reflects risk
+    get_radius="magnitude * 9000",   # Cleaner scaling
+    get_fill_color="color",
     pickable=True,
 )
 
@@ -219,9 +219,9 @@ deck = pdk.Deck(
 st.pydeck_chart(deck)
 
 st.info(
-    "Conclusion: Higher-magnitude earthquakes (shown in red) are concentrated along tectonic plate "
-    "boundaries, particularly around the Pacific Ring of Fire. "
-    "The risk levels shown are relative classifications based on magnitude distribution."
+    "Conclusion: Higher-magnitude earthquakes (shown in red) exhibit clear spatial clustering "
+    "along tectonic plate boundaries, particularly around the Pacific Ring of Fire. "
+    "The risk levels shown are relative classifications derived from the magnitude distribution."
 )
 
 
@@ -450,6 +450,7 @@ st.info(
     "Violin Plot Conclusion: The distribution shows that tsunami-generating earthquakes "
     "generally have higher magnitudes and a wider upper range compared to non-tsunami events."
 )
+
 
 
 
