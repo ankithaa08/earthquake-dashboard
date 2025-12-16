@@ -72,6 +72,43 @@ def depth_category(d):
 df["mag_category"] = df["magnitude"].apply(mag_category)
 df["depth_category"] = df["depth"].apply(depth_category)
 
+st.markdown("## 🌊 Tsunami Occurrence Analysis")
+
+# Count tsunami events
+tsunami_counts = (
+    df["tsunami"]
+    .value_counts()
+    .sort_index()
+)
+
+fig, ax = plt.subplots(figsize=(5, 4))
+
+ax.bar(
+    ["No Tsunami (0)", "Tsunami (1)"],
+    tsunami_counts,
+)
+
+ax.set_xlabel("Tsunami Occurrence")
+ax.set_ylabel("Number of Earthquakes")
+ax.set_title("Frequency of Tsunami vs Non-Tsunami Earthquakes")
+
+show_plot(fig)
+fig, ax = plt.subplots(figsize=(5, 4))
+
+sns.boxplot(
+    x="tsunami",
+    y="magnitude",
+    data=df,
+    ax=ax
+)
+
+ax.set_xlabel("Tsunami (0 = No, 1 = Yes)")
+ax.set_ylabel("Magnitude")
+ax.set_title("Magnitude Distribution for Tsunami vs Non-Tsunami Earthquakes")
+
+show_plot(fig)
+
+
 # ---------- REGION ---------- #
 def classify_region(lat, lon):
     if pd.isna(lat) or pd.isna(lon): return "Unknown"
@@ -383,6 +420,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
