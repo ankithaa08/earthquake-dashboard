@@ -218,20 +218,30 @@ st.info(
 # =========================================================
 st.markdown("<h2>➤ Summary Statistics</h2>", unsafe_allow_html=True)
 
-summary=[]
+summary = []
+
 for col in meaningful_cols:
-    s=df[col].dropna()
+    if col == "tsunami":
+        continue   # skip tsunami (binary variable)
+
+    s = df[col].dropna()
     summary.append({
-        "Variable":col,
-        "Mean":s.mean(),
-        "Median":s.median(),
-        "Std Dev":s.std(),
-        "MAD":np.median(np.abs(s-s.median())),
-        "IQR":s.quantile(0.75)-s.quantile(0.25)
+        "Variable": col,
+        "Mean": s.mean(),
+        "Median": s.median(),
+        "Std Dev": s.std(),
+        "MAD": np.median(np.abs(s - s.median())),
+        "IQR": s.quantile(0.75) - s.quantile(0.25)
     })
 
 st.dataframe(pd.DataFrame(summary).set_index("Variable"))
-st.info("Conclusion: High variability and skewness are observed in earthquake data.")
+
+st.info(
+    "Conclusion: Continuous variables such as magnitude and depth show variability and skewness. "
+    "Ordinal variables are better interpreted using median and IQR. "
+    "Binary variables like tsunami are excluded from dispersion statistics."
+)
+
 
 # =========================================================
 # BOXPLOTS
@@ -392,6 +402,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
