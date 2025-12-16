@@ -124,23 +124,6 @@ show_plot(fig)
 
 st.info("Conclusion: Earthquake and tsunami occurrences vary across years.")
 
-st.markdown("## 🌊 Tsunami vs Earthquake Magnitude")
-
-fig, ax = plt.subplots(figsize=(5, 4))
-
-sns.boxplot(
-    x="tsunami",
-    y="magnitude",
-    data=df,
-    ax=ax
-)
-
-ax.set_xlabel("Tsunami (0 = No, 1 = Yes)")
-ax.set_ylabel("Magnitude")
-ax.set_title("Magnitude Distribution for Tsunami vs Non-Tsunami Earthquakes")
-
-show_plot(fig)
-
 
 # =========================================================
 # REGION ANALYSIS
@@ -255,16 +238,22 @@ st.info("Conclusion: High variability and skewness are observed in earthquake da
 # =========================================================
 st.markdown("<h2>➤ Box Plots</h2>", unsafe_allow_html=True)
 
-cA,cB=st.columns(2)
-y1=st.selectbox("Boxplot Y-axis 1:",numeric_cols,index=0)
-y2=st.selectbox("Boxplot Y-axis 2:",numeric_cols,index=1)
+st.markdown("## 🌊 Tsunami vs Earthquake Magnitude")
 
-fig_b,axes=plt.subplots(1,2,figsize=(7,3))
-sns.boxplot(y=df[y1].dropna(),ax=axes[0])
-sns.boxplot(y=df[y2].dropna(),ax=axes[1])
-show_plot(fig_b)
+fig, ax = plt.subplots(figsize=(5, 4))
 
-st.info("Conclusion: Presence of outliers confirms non-normal distributions.")
+sns.boxplot(
+    x="tsunami",
+    y="magnitude",
+    data=df,
+    ax=ax
+)
+
+ax.set_xlabel("Tsunami (0 = No, 1 = Yes)")
+ax.set_ylabel("Magnitude")
+ax.set_title("Magnitude Distribution for Tsunami vs Non-Tsunami Earthquakes")
+
+show_plot(fig)
 
 # =========================================================
 # HISTOGRAM & DENSITY
@@ -403,6 +392,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
