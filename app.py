@@ -377,40 +377,81 @@ for i, col1 in enumerate(data.columns):
 # =========================================================
 st.markdown("<h2>➤ Relationship Plots</h2>", unsafe_allow_html=True)
 
-x_sel=st.selectbox("X-axis:",numeric_cols,index=0)
-y_sel=st.selectbox("Y-axis:",numeric_cols,index=1)
+# ---------------- Scatter Plot ----------------
+st.subheader("Scatter Plot: Magnitude vs Depth")
 
-# Scatter
-st.subheader("Scatter Plot")
-fig_sc,ax_sc=plt.subplots(figsize=(5,3))
-sns.scatterplot(x=df[x_sel],y=df[y_sel],hue=df["tsunami"],ax=ax_sc,s=20)
+fig_sc, ax_sc = plt.subplots(figsize=(5,3))
+sns.scatterplot(
+    x=df["depth"],
+    y=df["magnitude"],
+    hue=df["tsunami"],
+    palette={0: "blue", 1: "red"},
+    alpha=0.5,
+    s=20,
+    ax=ax_sc
+)
+
+ax_sc.set_xlabel("Depth (km)")
+ax_sc.set_ylabel("Magnitude")
+ax_sc.set_title("Scatter Plot of Magnitude vs Depth")
+
 show_plot(fig_sc)
 
-# Hexbin
-st.subheader("Hexbin Plot")
-fig_hb,ax_hb=plt.subplots(figsize=(5,3))
-hb=ax_hb.hexbin(df[x_sel],df[y_sel],gridsize=25)
-fig_hb.colorbar(hb)
+st.info(
+    "Scatter Plot Conclusion: The plot shows a wide spread of magnitudes across depths, "
+    "indicating no strong linear relationship between earthquake depth and magnitude. "
+    "Tsunami events (red) tend to occur at moderate to higher magnitudes."
+)
+
+# ---------------- Hexbin Plot ----------------
+st.subheader("Hexbin Plot: Magnitude vs Depth (Density View)")
+
+fig_hb, ax_hb = plt.subplots(figsize=(5,3))
+hb = ax_hb.hexbin(
+    df["depth"],
+    df["magnitude"],
+    gridsize=30,
+    cmap="viridis"
+)
+
+ax_hb.set_xlabel("Depth (km)")
+ax_hb.set_ylabel("Magnitude")
+ax_hb.set_title("Hexbin Density Plot of Magnitude vs Depth")
+
+fig_hb.colorbar(hb, ax=ax_hb, label="Event Density")
 show_plot(fig_hb)
 
-# Contour
-st.subheader("Contour Plot")
-fig_ct,ax_ct=plt.subplots(figsize=(5,3))
-sns.kdeplot(x=df[x_sel].dropna(),y=df[y_sel].dropna(),fill=True,ax=ax_ct)
-show_plot(fig_ct)
+st.info(
+    "Hexbin Plot Conclusion: The hexbin plot highlights dense clusters of shallow earthquakes, "
+    "showing that most seismic activity occurs at lower depths, while deep and high-magnitude "
+    "events are comparatively rare."
+)
 
-# Violin
-st.subheader("Violin Plot")
-cat_cols=[c for c in ["mag_category","depth_category","region"] if c in df.columns]
-vcat=st.selectbox("Category:",cat_cols)
-vy=st.selectbox("Numeric:",numeric_cols)
+# ---------------- Violin Plot ----------------
+st.subheader("Violin Plot: Magnitude vs Tsunami")
 
-fig_v,ax_v=plt.subplots(figsize=(5,3))
-sns.violinplot(data=df,x=vcat,y=vy,ax=ax_v)
-plt.xticks(rotation=25)
+fig_v, ax_v = plt.subplots(figsize=(5,3))
+sns.violinplot(
+    data=df,
+    x="tsunami",
+    y="magnitude",
+    inner="quartile",
+    cut=0,
+    ax=ax_v
+)
+
+ax_v.set_xlabel("Tsunami (0 = No, 1 = Yes)")
+ax_v.set_ylabel("Magnitude")
+ax_v.set_title("Distribution of Earthquake Magnitude by Tsunami Occurrence")
+
 show_plot(fig_v)
 
-st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+st.info(
+    "Violin Plot Conclusion: The distribution shows that tsunami-generating earthquakes "
+    "generally have higher magnitudes and a wider upper range compared to non-tsunami events."
+)
+
+
 
 
 
