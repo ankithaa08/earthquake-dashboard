@@ -347,18 +347,19 @@ st.subheader("Spearman Correlation Coefficient (ρ)")
 st.dataframe(corr_matrix.round(3))
 
 st.subheader("P-Value Matrix")
-st.dataframe(pval_matrix.round(4))
+st.dataframe(
+    pval_matrix.applymap(lambda x: f"{x:.2e}" if x < 0.001 else f"{x:.4f}")
+)
+
 
 st.subheader("Statistical Significance (α = 0.05)")
 st.dataframe(sig_matrix)
 
 # ---- Explanation ----
 st.info("""
-**How to read this analysis:**
 - Spearman correlation (ρ) measures monotonic relationships.
 - It is suitable for skewed and ordinal variables.
 - A p-value < 0.05 indicates a statistically significant relationship.
-- Binary variables (like tsunami) are excluded from this analysis.
 """)
 
 # ---- Final conclusion (deduplicated & safe) ----
@@ -368,19 +369,6 @@ for i, col1 in enumerate(data.columns):
     for col2 in data.columns[i+1:]:
         if pval_matrix.loc[col1, col2] < 0.05:
             significant_pairs.add(f"{col1} ↔ {col2}")
-
-if significant_pairs:
-    st.success(
-        "Conclusion: Statistically significant monotonic relationships are observed between "
-        + ", ".join(significant_pairs)
-        + ". Strong associations involving magnitude and significance are expected, as "
-          "significance is a derived measure. Depth shows weak associations with most variables."
-    )
-else:
-    st.warning(
-        "Conclusion: No statistically significant monotonic relationships were detected. "
-        "Observed correlations may be due to random variation."
-    )
 
 
 
@@ -423,6 +411,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
