@@ -132,15 +132,28 @@ st.subheader("Region-Based Analysis")
 
 regions = sorted(df["region"].dropna().unique())
 selected_region = st.selectbox("Select region:", regions)
-df_r = df[df["region"]==selected_region]
 
-st.markdown(f"**Total earthquakes in {selected_region}: {len(df_r)}**")
+df_r = df[df["region"] == selected_region]
 
-fig_r, ax_r = plt.subplots(figsize=(5,3))
-sns.histplot(df_r["magnitude"].dropna(), bins=20, kde=True, ax=ax_r)
-show_plot(fig_r)
+# Simple count
+total_eq = len(df_r)
+st.markdown(f"**Total earthquakes in {selected_region}: {total_eq}**")
 
-st.info("Conclusion: Magnitude distribution differs by geographic region.")
+# Simple, meaningful insights
+if total_eq == 0:
+    st.info("No recorded earthquakes for this region in the dataset.")
+else:
+    avg_mag = df_r["magnitude"].mean()
+    max_mag = df_r["magnitude"].max()
+
+    st.info(
+        f"In {selected_region}, earthquake occurrence is relatively "
+        f"{'low' if total_eq < 20 else 'moderate'}. "
+        f"The average magnitude is approximately {avg_mag:.2f}, "
+        f"with a maximum recorded magnitude of {max_mag:.2f}. "
+        "Due to limited observations in some regions, distribution-based plots are not shown."
+    )
+
 
 # =========================================================
 # MEANINGFUL RISK-BASED EARTHQUAKE MAP
@@ -239,7 +252,6 @@ st.dataframe(pd.DataFrame(summary).set_index("Variable"))
 st.info(
     "Conclusion: Continuous variables such as magnitude and depth show variability and skewness. "
     "Ordinal variables are better interpreted using median and IQR. "
-    "Binary variables like tsunami are excluded from dispersion statistics."
 )
 
 
@@ -402,6 +414,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
