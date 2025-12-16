@@ -347,8 +347,7 @@ st.subheader("Spearman Correlation Coefficient (ρ)")
 st.dataframe(corr_matrix.round(3))
 
 st.subheader("P-Value Matrix")
-st.dataframe(
-    pval_matrix.applymap(lambda x: f"{x:.2e}" if x < 0.001 else f"{x:.4f}")
+st.dataframe(st.dataframe(pval_matrix.round(4))
 )
 
 
@@ -411,6 +410,7 @@ plt.xticks(rotation=25)
 show_plot(fig_v)
 
 st.info("Conclusion: Relationship plots show clustering and non-linear patterns.")
+
 
 
 
