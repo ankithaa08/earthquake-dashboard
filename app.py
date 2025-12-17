@@ -122,7 +122,6 @@ else:
     ax.legend()
 show_plot(fig)
 
-st.info("Conclusion: Earthquake and tsunami occurrences vary across years.")
 
 
 # =========================================================
@@ -445,6 +444,7 @@ ax_v.set_ylabel("Magnitude")
 ax_v.set_title("Distribution of Earthquake Magnitude by Tsunami Occurrence")
 
 show_plot(fig_v)
+
 
 
 
