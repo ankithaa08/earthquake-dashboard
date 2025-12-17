@@ -446,10 +446,7 @@ ax_v.set_title("Distribution of Earthquake Magnitude by Tsunami Occurrence")
 
 show_plot(fig_v)
 
-st.info(
-    "Violin Plot Conclusion: The distribution shows that tsunami-generating earthquakes "
-    "generally have higher magnitudes and a wider upper range compared to non-tsunami events."
-)
+
 
 
 
