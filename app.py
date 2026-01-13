@@ -461,25 +461,15 @@ st.write(
 )
 
 # --------------------------------------------------
-# Theory
-# --------------------------------------------------
-st.header("Theoretical Background")
-st.write("""
-Earthquake magnitude is a continuous numerical variable measured on the Richter scale.
-A magnitude of 5.0 is considered the threshold for moderate earthquakes.
-
-To evaluate whether earthquakes recorded over several years tend to be more severe than
-this threshold, a **one-sample t-test** is applied. This test compares the sample mean with
-a known population value when the population standard deviation is unknown.
-""")
-
-# --------------------------------------------------
 # Hypotheses
 # --------------------------------------------------
 st.header("Hypotheses Formulation")
 st.write("""
-- **Null Hypothesis (H₀):**There is no significant difference between the mean earthquake magnitude and the moderate seismic threshold value of 5.0. 
-- **Alternative Hypothesis (H₁):** There is a significant increase in the mean earthquake magnitude compared to the moderate seismic threshold value of 5.0.  
+- **Null Hypothesis (H₀):** There is no significant difference between the mean earthquake 
+  magnitude and the moderate seismic threshold value of 5.0.  
+
+- **Alternative Hypothesis (H₁):** There is a significant increase in the mean earthquake 
+  magnitude compared to the moderate seismic threshold value of 5.0.  
 
 This is a **right-tailed test** conducted at a significance level (α) of 0.05.
 """)
@@ -495,7 +485,6 @@ st.dataframe(df.head())
 # Select Magnitude Column
 # --------------------------------------------------
 st.header("Hypothesis Test Execution")
-
 numeric_cols = df.select_dtypes(include=np.number).columns
 magnitude_col = st.selectbox("Select the earthquake magnitude column:", numeric_cols)
 
@@ -504,42 +493,47 @@ data = df[magnitude_col].dropna()
 # --------------------------------------------------
 # One-Sample t-Test
 # --------------------------------------------------
-t_stat, p_value = ttest_1samp(data, popmean=5)
+t_stat, _ = ttest_1samp(data, popmean=5)
 
-# Right-tailed p-value
-p_value_one_tailed = p_value / 2
+# --------------------------------------------------
+# t-table based decision
+# --------------------------------------------------
+alpha = 0.05
+dfree = len(data) - 1
+
+# Large sample → t-table (df → ∞)
+t_critical = 1.645
 
 # --------------------------------------------------
 # Results
 # --------------------------------------------------
 st.subheader("Test Results")
-st.write(f"Sample Size: **{len(data)}**")
+st.write(f"Sample Size (n): **{len(data)}**")
+st.write(f"Degrees of Freedom (df): **{dfree}**")
 st.write(f"Sample Mean Magnitude: **{data.mean():.3f}**")
-st.write(f"T-statistic: **{t_stat:.3f}**")
-st.write(f"P-value (Right-tailed): **{p_value_one_tailed:.4f}**")
+st.write(f"Calculated t-statistic: **{t_stat:.3f}**")
+st.write(f"Critical t-value (α = 0.05, right-tailed): **{t_critical}**")
 
 # --------------------------------------------------
 # Conclusion
 # --------------------------------------------------
 st.header("Conclusion")
 
-alpha = 0.05
-
-if p_value_one_tailed < alpha and data.mean() > 5:
+if t_stat > t_critical:
     st.success("""
-    Since the p-value is less than the significance level (0.05),
-    we reject the null hypothesis.
+    Since the calculated t-statistic is greater than the critical t-value obtained
+    from the t-table, the null hypothesis is rejected.
 
-    **Conclusion:** There is sufficient statistical evidence to conclude that
-    the average earthquake magnitude is significantly greater than 5.0.
+    **Conclusion:** There is sufficient statistical evidence to conclude that the
+    average earthquake magnitude is significantly greater than 5.0.
     """)
 else:
     st.info("""
-    Since the p-value is greater than the significance level (0.05),
-    we fail to reject the null hypothesis.
+    Since the calculated t-statistic is less than the critical t-value obtained
+    from the t-table, the null hypothesis is not rejected.
 
-    **Conclusion:** There is insufficient statistical evidence to conclude that
-    the average earthquake magnitude is greater than 5.0.
+    **Conclusion:** There is insufficient statistical evidence to conclude that the
+    average earthquake magnitude is greater than 5.0.
     """)
 
 
