@@ -448,71 +448,98 @@ show_plot(fig_v)
 
 st.title("Earthquake Data Hypothesis Testing")
 
+st.title("Hypothesis Testing on Earthquake Magnitude Data")
+
+# --------------------------------------------------
 # Problem Statement
+# --------------------------------------------------
 st.header("Problem Statement")
 st.write(
-    "To test whether the average magnitude of earthquakes "
-    "from 1995 to 2023 is significantly greater than 5.0."
+    "To statistically assess whether the long-term global mean earthquake magnitude "
+    "significantly exceeds the moderate seismic threshold of 5.0 using historical data "
+    "from 1995 to 2023."
 )
 
+# --------------------------------------------------
+# Theory
+# --------------------------------------------------
+st.header("Theoretical Background")
+st.write("""
+Earthquake magnitude is a continuous numerical variable measured on the Richter scale.
+A magnitude of 5.0 is considered the threshold for moderate earthquakes.
+
+To evaluate whether earthquakes recorded over several years tend to be more severe than
+this threshold, a **one-sample t-test** is applied. This test compares the sample mean with
+a known population value when the population standard deviation is unknown.
+""")
+
+# --------------------------------------------------
+# Hypotheses
+# --------------------------------------------------
+st.header("Hypotheses Formulation")
+st.write("""
+- **Null Hypothesis (H₀):**There is no significant difference between the mean earthquake magnitude and the moderate seismic threshold value of 5.0. 
+- **Alternative Hypothesis (H₁):** There is a significant increase in the mean earthquake magnitude compared to the moderate seismic threshold value of 5.0.  
+
+This is a **right-tailed test** conducted at a significance level (α) of 0.05.
+""")
+
+# --------------------------------------------------
 # Load Dataset
+# --------------------------------------------------
 st.header("Dataset Preview")
 df = pd.read_csv("earthquake_1995-2023.csv")
 st.dataframe(df.head())
 
+# --------------------------------------------------
 # Select Magnitude Column
-st.header("Hypothesis Testing")
-magnitude_col = st.selectbox(
-    "Select magnitude column:",
-    df.select_dtypes(include=np.number).columns
-)
+# --------------------------------------------------
+st.header("Hypothesis Test Execution")
+
+numeric_cols = df.select_dtypes(include=np.number).columns
+magnitude_col = st.selectbox("Select the earthquake magnitude column:", numeric_cols)
 
 data = df[magnitude_col].dropna()
 
-# Hypothesis description
-st.subheader("Hypotheses")
-st.write("H₀: Mean magnitude = 5.0")
-st.write("H₁: Mean magnitude > 5.0")
-
-# One-sample t-test
+# --------------------------------------------------
+# One-Sample t-Test
+# --------------------------------------------------
 t_stat, p_value = ttest_1samp(data, popmean=5)
 
-# One-tailed p-value
+# Right-tailed p-value
 p_value_one_tailed = p_value / 2
 
+# --------------------------------------------------
 # Results
+# --------------------------------------------------
 st.subheader("Test Results")
-st.write(f"Sample Mean: **{data.mean():.2f}**")
+st.write(f"Sample Size: **{len(data)}**")
+st.write(f"Sample Mean Magnitude: **{data.mean():.3f}**")
 st.write(f"T-statistic: **{t_stat:.3f}**")
-st.write(f"P-value (one-tailed): **{p_value_one_tailed:.4f}**")
+st.write(f"P-value (Right-tailed): **{p_value_one_tailed:.4f}**")
 
-# Decision
+# --------------------------------------------------
+# Conclusion
+# --------------------------------------------------
+st.header("Conclusion")
+
 alpha = 0.05
-st.subheader("Conclusion")
 
 if p_value_one_tailed < alpha and data.mean() > 5:
-    st.success("Reject H₀: The average earthquake magnitude is significantly greater than 5.0")
+    st.success("""
+    Since the p-value is less than the significance level (0.05),
+    we reject the null hypothesis.
+
+    **Conclusion:** There is sufficient statistical evidence to conclude that
+    the average earthquake magnitude is significantly greater than 5.0.
+    """)
 else:
-    st.info("Fail to Reject H₀: No significant evidence that the mean magnitude is greater than 5.0")
+    st.info("""
+    Since the p-value is greater than the significance level (0.05),
+    we fail to reject the null hypothesis.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    **Conclusion:** There is insufficient statistical evidence to conclude that
+    the average earthquake magnitude is greater than 5.0.
+    """)
 
 
