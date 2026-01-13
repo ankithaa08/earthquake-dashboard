@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.stats import ttest_1samp
 
 # ----------------- PAGE CONFIG ----------------- #
 st.set_page_config(page_title="Earthquake & Tsunami Dashboard (1995–2023)", layout="wide")
@@ -444,6 +445,56 @@ ax_v.set_ylabel("Magnitude")
 ax_v.set_title("Distribution of Earthquake Magnitude by Tsunami Occurrence")
 
 show_plot(fig_v)
+
+st.title("Earthquake Data Hypothesis Testing")
+
+# Problem Statement
+st.header("Problem Statement")
+st.write(
+    "To test whether the average magnitude of earthquakes "
+    "from 1995 to 2023 is significantly greater than 5.0."
+)
+
+# Load Dataset
+st.header("Dataset Preview")
+df = pd.read_csv("earthquake_1995-2023.csv")
+st.dataframe(df.head())
+
+# Select Magnitude Column
+st.header("Hypothesis Testing")
+magnitude_col = st.selectbox(
+    "Select magnitude column:",
+    df.select_dtypes(include=np.number).columns
+)
+
+data = df[magnitude_col].dropna()
+
+# Hypothesis description
+st.subheader("Hypotheses")
+st.write("H₀: Mean magnitude = 5.0")
+st.write("H₁: Mean magnitude > 5.0")
+
+# One-sample t-test
+t_stat, p_value = ttest_1samp(data, popmean=5)
+
+# One-tailed p-value
+p_value_one_tailed = p_value / 2
+
+# Results
+st.subheader("Test Results")
+st.write(f"Sample Mean: **{data.mean():.2f}**")
+st.write(f"T-statistic: **{t_stat:.3f}**")
+st.write(f"P-value (one-tailed): **{p_value_one_tailed:.4f}**")
+
+# Decision
+alpha = 0.05
+st.subheader("Conclusion")
+
+if p_value_one_tailed < alpha and data.mean() > 5:
+    st.success("Reject H₀: The average earthquake magnitude is significantly greater than 5.0")
+else:
+    st.info("Fail to Reject H₀: No significant evidence that the mean magnitude is greater than 5.0")
+
 
 
 
